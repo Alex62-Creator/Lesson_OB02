@@ -14,89 +14,85 @@
 
 # Класс User - базовый
 class User():
-    def __init__(self, id, name):
-        self.__id = id                    # ID сотрудника
-        self.__name = name                # сотрудника
-        self.__access_level = "user"      # сотрудника
+    # Конструктор класса
+    def __init__(self, name):
+        self.__name = name                # ФИО сотрудника
+        self.__access_level = "user"      # Уровень доступа сотрудника
 
     # Получение информации о сотруднике
     def get_info(self):
-        return self.__id, self.__name, self.__access_level
+        return self.__name, self.__access_level
 
 
 # Класс Admin - дочерний
 class Admin(User):
-    def __init__(self, id, name, admin_level):
-        super().__init__(id, name)
-        self.__admin_level = admin_level
-        self.list_employee = {}
-        self.last_id = 1
+    # Конструктор класса
+    def __init__(self, name, level):
+        super().__init__(name)              # Наследуем только ФИО
+        self.__id = 1                       # ID админа
+        self.__admin_level = level          # Уровень доступа
+        self.list_employee = {}             # Словарь где будем хранить список сотрудников
+        self.last_id = 1                    # Ключ Он же будет являться ID сотрудника
 
     # Добавление нового сотрудника
-    def add_user(self, name):
-        self.last_id += 1
-        list_employee[self.last_id] = User(self.last_id, name)
+    def add_user(self, user):
+        if isinstance(user, User):          # Проверяем принадлежность объекта классу User
+            self.last_id += 1               # Формируем ID
+            self.list_employee[self.last_id] = user
+            print(f"ID сотрудника {name} - {self.last_id}")
+        else:
+            print("Формат данных о сотруднике неправильный")
 
-    
+    # Удаление сотрудника
+    def remove_user(self, id):
+        if id in self.list_employee:        # Проверяем наличие сотрудника в списке
+            user = self.list_employee.pop(id)
+            print(f"Сотрудник {user._User__name} удален")
+        else:
+            print(f"Сотрудника с ID {id} нет")
 
+    # Получение информации о сотруднике
+    def get_user_info(self, id):            # Проверяем наличие сотрудника в списке
+        if id in self.list_employee:
+            user = self.list_employee[id].get_info()    # Получаем приватные данные о сотруднике
+            print(f"Сотрудник {user[0]} имеет ID {id} и уровень доступа {user[1]}")
+        else:
+            print(f"Сотрудника с ID {id} нет")
 
-    # Увольнение сотрудника
-    def remove_user(self, name):
-        pass
+    # Вывод списка сотрудников
+    def get_all_user(self):
+        print("{0:^4} {1:^30} {2:^6}".format("ID", "ФИО", "Доступ"))
+        print("="*42)
+        for id in self.list_employee:
+            user = self.list_employee[id].get_info()    # Получаем приватные данные о сотруднике
+            print("{0:^4} {1:<30} {2:<6}".format(id, user[0], user[1]))
 
-    # Установка уровня доступа "admin" сотруднику
-    def set_access(self, level):
-        self.__access_level = level
-
-    # Получение уровня доступа сотрудника
-    def get_access(self):
-        return self.__access_level
-
-list_employee = {}
-last_id = 0
-
-list_employee[last_id + 1] = Admin("Чухланцев Александр", "admin")
-last_id += 1
-
+admin = Admin("Чухланцев Александр", "admin")   # Создаем объект класса Admin
 
 # Запускаем цикл общения с пользователем
 while True:
     print("1 - Добавить сотрудника")
-    print("2 - Отметить задачу выполненной")
-    print("3 - Вывести список текущих задач")
-    print("4 - Завершить программу")
+    print("2 - Удалить сотрудника")
+    print("3 - Получить данные по сотруднику")
+    print("4 - Вывести список всех сотрудников")
+    print("5 - Завершить программу")
 
     num = input("Выберите действие: ")
 
     match num:
         case "1":
-            id = input("Введите ваш ID: ")
-            if id in list_employee and list_employee[int(id)].access == "admin":
-                name = input("Введите ваше имя")
-                access = input("Введите ваш доступ")
-                last_id += 1
-
-            while True:
-                deadline = input("Введите срок выполнения в формате ДД:ММ:ГГ: ")
-                obj = Check(deadline)
-                print(obj.date)
-                if not obj.check_date():
-                    del obj
-                    print("Неверный формат даты")
-                else:
-                    del obj
-                    break
-            menager.add(description, deadline)
+            name = input("Введите Фамилию и Имя сотрудника: ")
+            user = User(name)                                   # Создаем объект класса User
+            admin.add_user(user)                                # Добавляем нового сотрудника
         case "2":
-            menager.print_tasks()
-            index = int(input("Введите индекс выполненной задачи: "))
-            menager.completed(index)
+            id = int(input("Введите ID сотрудника: "))
+            admin.remove_user(id)                               # Удаляем сотрудника
         case "3":
-            menager.print_tasks()
+            id = int(input("Введите ID сотрудника: "))
+            admin.get_user_info(id)                             # Запрашиваем информацию по сотруднику
         case "4":
-            menager.exit()
+            admin.get_all_user()                                # Запрашиваем список сотрудников
+        case "5":
             break
         case _:
             print("Такого действия нет. Повторите выбор.")
-
-
